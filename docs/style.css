@@ -210,15 +210,13 @@ header { margin-bottom: 48px; }
   margin-bottom: 12px;
 }
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 64px;
+  height: 64px;
   border-radius: 10px;
-  background: #ffffff;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7px;
 }
 .logo img {
   width: 100%;
