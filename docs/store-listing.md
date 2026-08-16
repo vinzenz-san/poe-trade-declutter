@@ -4,7 +4,7 @@ Copy-paste source for the Chrome Web Store / Firefox AMO submission forms.
 
 ## Short description (Chrome: max 132 characters)
 
-Hide, reorder, and declutter the filter categories on the Path of Exile trade site's search page.
+Hide unwanted filter categories and individual filters on the Path of Exile trade site's search page.
 
 ## Full description
 
@@ -19,7 +19,11 @@ This is an independent, unofficial project — not affiliated with or endorsed b
 
 ## Category
 
-Productivity / Tools (Chrome) — "Other" or "Gaming" (Firefox AMO)
+Productivity / Tools (Chrome) — "Spiele und Unterhaltung" / Games & Entertainment (Firefox AMO)
+
+## License
+
+MIT (matches the repo's `LICENSE` file) — not GPL.
 
 ## Permission justifications (for review forms)
 
