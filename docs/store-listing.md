@@ -19,6 +19,23 @@ Hide unwanted trade filters and pick minimum stat tiers on the Path of Exile tra
 
 This is an independent, unofficial project — not affiliated with or endorsed by Grinding Gear Games.
 
+## Full description (plain text — paste as-is)
+
+Chrome's description field doesn't render Markdown: pasting the section above literally shows the `**`/`[]()` characters and no clickable links. This is the same content converted to plain text.
+
+```
+PoE Trade Declutter lets you tidy up the official Path of Exile trade site's search filters to match how you actually search, and adds a tier picker for stat filters.
+
+- Hide whole filter categories you never use (e.g. Sanctum Filters, Heist Filters) — collapse them out of the way with one click, and bring them back just as easily.
+- Hide individual filters within a category (e.g. "Base Percentile" under Miscellaneous) without losing the ones you do use.
+- Pick a minimum stat tier directly from a stat filter's min/max boxes — no more looking up exact tier value ranges.
+- Browse every possible modifier for the selected item category and add one straight into your search.
+- Everything is reversible — a small "Hidden filters (N)" toggle per category, and a global "Reveal all hidden" button, let you review or restore anything you've hidden.
+- No account, no sign-in, no tracking. Your preferences are stored locally in your browser and never leave your device. Tier data is fetched from RePoE (github.com/brather1ng/RePoE), a public, community-maintained mirror of Path of Exile's own game data — no information about you is sent as part of that fetch.
+
+This is an independent, unofficial project — not affiliated with or endorsed by Grinding Gear Games.
+```
+
 ## Category
 
 Productivity / Tools (Chrome) — "Spiele und Unterhaltung" / Games & Entertainment (Firefox AMO)
@@ -43,7 +60,7 @@ MIT (matches the repo's `LICENSE` file) — not GPL.
 
 ## Privacy policy URL
 
-Once GitHub Pages is enabled for this repo (Settings → Pages → Source: GitHub Actions): `https://vinzenz-dev.de/poe-trade-declutter/privacy.html`
+`https://vinzenz-dev.de/poe-trade-declutter/privacy.html`
 
 ## Screenshots needed
 
