@@ -2,7 +2,13 @@ import browser from "webextension-polyfill";
 import { SHOW_INACTIVE_FIELDS_CLASS } from "./domFields";
 import { GROUPS_CONTAINER_CLASS, SHOW_HIDDEN_GROUPS_CLASS } from "./inlineControls";
 import { resetTunerSettings } from "./settings";
-import { getTiersSettings, setTiersSetting, tiersSettingsReady, type TiersSettings } from "./tiers/tiersContent";
+import {
+  getTiersSettings,
+  refreshTierTableNow,
+  setTiersSetting,
+  tiersSettingsReady,
+  type TiersSettings,
+} from "./tiers/tiersContent";
 
 const ROOT_ID = "ptt-fab-root";
 const RESET_ARM_TIMEOUT_MS = 3000;
@@ -111,8 +117,45 @@ function buildTiersSection(): HTMLElement {
   section.appendChild(
     buildToggleRow("Browse Base Mods button", current.browseModsEnabled, (val) => set("browseModsEnabled", val))
   );
+  section.appendChild(buildRefreshTierDataRow());
 
   return section;
+}
+
+// RePoE's mods/stat-translations data is normally re-fetched at most once a
+// week (see tiersBackground.ts's MAX_AGE_MS) or on install — this button is
+// the escape hatch for "I know RePoE just changed and don't want to wait,"
+// bypassing that staleness check via forceRefresh.
+function buildRefreshTierDataRow(): HTMLElement {
+  const row = document.createElement("div");
+  row.className = "ptt-settings-row";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "ptt-btn";
+  button.textContent = "Refresh tier data now";
+
+  button.onclick = () => {
+    button.disabled = true;
+    button.textContent = "Refreshing…";
+    void refreshTierTableNow()
+      .then(() => {
+        button.textContent = "Refreshed ✓";
+      })
+      .catch((err) => {
+        console.error("[PoE Trade Tiers] manual refresh failed", err);
+        button.textContent = "Refresh failed";
+      })
+      .finally(() => {
+        window.setTimeout(() => {
+          button.disabled = false;
+          button.textContent = "Refresh tier data now";
+        }, 2000);
+      });
+  };
+
+  row.appendChild(button);
+  return row;
 }
 
 function anyRevealed(): boolean {

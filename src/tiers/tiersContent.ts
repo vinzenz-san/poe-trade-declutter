@@ -115,6 +115,19 @@ function removeAllBrowseButtons() {
   document.querySelectorAll(".ptt-browse-wrapper").forEach((el) => el.remove());
 }
 
+// Manual "refresh now" control (floatingPanel.ts) — bypasses getTierTable's
+// MAX_AGE_MS staleness check via forceRefresh, then tears down existing
+// tier pickers/Browse Mods buttons so the next scan() tick (SCAN_INTERVAL_MS
+// later) rebuilds them against the freshly fetched tierTable instead of
+// stale closures capturing the old entries.
+export async function refreshTierTableNow(): Promise<void> {
+  const message: GetTierTableMessage = { type: "GET_TIER_TABLE", forceRefresh: true };
+  tierTable = (await browser.runtime.sendMessage(message)) as TierTable;
+  removeAllTierPickers();
+  removeAllBrowseButtons();
+  log("tier table force-refreshed", tierTable);
+}
+
 // Build a normalized-label -> itemClassKey lookup once.
 const CATEGORY_LOOKUP: Record<string, string> = {};
 for (const [key, def] of Object.entries(ITEM_CLASSES)) {
