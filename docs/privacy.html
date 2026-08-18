@@ -16,16 +16,17 @@
 </head>
 <body>
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: 2026-08-16</p>
+  <p class="updated">Last updated: 2026-08-18</p>
 
-  <p>PoE Trade Declutter is a browser extension (Firefox &amp; Chrome) that lets you hide or reorder filter categories and stat filters on the official Path of Exile trade site (<code>pathofexile.com/trade</code>). This policy explains what the extension accesses and why.</p>
+  <p>PoE Trade Declutter is a browser extension (Firefox &amp; Chrome) that lets you hide or reorder filter categories and stat filters, and pick minimum stat tiers, on the official Path of Exile trade site (<code>pathofexile.com/trade</code>). This policy explains what the extension accesses and why.</p>
 
   <h2>Summary</h2>
   <ul>
-    <li>The extension does not operate a server, does not use analytics, and does not transmit any data anywhere.</li>
-    <li>Your preferences (which categories and filters you've marked hidden) are stored only in your browser's local extension storage (<code>browser.storage.local</code>), via the standard <code>storage</code> permission. This data never leaves your device.</li>
-    <li>The extension only runs on <code>pathofexile.com/trade</code> and <code>pathofexile.com/trade2</code> pages. It does not run on, read, or access any other website.</li>
-    <li>The extension reads data already present on the trade page — its own filter definitions and your existing session settings, both stored by the Path of Exile trade site itself in your browser's <code>localStorage</code> — purely to know which categories and filters currently exist, so it can add show/hide controls next to them. Nothing read this way is copied, stored elsewhere, or sent off your device.</li>
+    <li>The extension does not operate its own server, does not use analytics, and does not transmit any of your data anywhere.</li>
+    <li>It does make one kind of outgoing network request: fetching publicly-published Path of Exile game-data files from <a href="https://github.com/brather1ng/RePoE" target="_blank" rel="noopener noreferrer">RePoE</a> (a third-party, community-maintained data mirror hosted on GitHub) to build the tier-picker's stat tables. This is a one-way read of public data — no information about you or your searches is sent as part of it.</li>
+    <li>Your preferences (which categories/filters you've marked hidden, tier-picker settings) and the fetched RePoE tier data are stored only in your browser's local extension storage (<code>browser.storage.local</code>), via the standard <code>storage</code> permission. None of this leaves your device.</li>
+    <li>The extension only runs on <code>pathofexile.com/trade</code> pages. It does not run on, read, or access any other website.</li>
+    <li>The extension reads data already present on the trade page — its own filter definitions and your existing session settings, both stored by the Path of Exile trade site itself in your browser's <code>localStorage</code> — purely to know which categories and filters currently exist, so it can add show/hide and tier-picker controls next to them. Nothing read this way is copied, stored elsewhere, or sent off your device.</li>
     <li>No account, sign-in, or personal information is required or collected.</li>
   </ul>
 
@@ -34,16 +35,20 @@
     <tr><th style="text-align:left">Permission</th><th style="text-align:left">Why it's needed</th></tr>
     <tr>
       <td><code>storage</code></td>
-      <td>Saves your chosen hidden categories/filters locally so they persist between visits to the trade site.</td>
+      <td>Saves your chosen hidden categories/filters and tier-picker settings locally so they persist between visits to the trade site, and caches the fetched RePoE tier data so it isn't re-downloaded on every page load.</td>
     </tr>
     <tr>
       <td>Host access to <code>pathofexile.com/trade*</code></td>
-      <td>Required to inject the show/hide controls into the trade site's filter panel. The extension does not run on any other page.</td>
+      <td>Required to inject the show/hide and tier-picker controls into the trade site's filter panel. The extension does not run on any other page.</td>
+    </tr>
+    <tr>
+      <td>Host access to <code>raw.githubusercontent.com/brather1ng/RePoE/*</code></td>
+      <td>Fetches RePoE's published Path of Exile stat/modifier data files, used to build the tier-picker's stat tables. Scoped to this one repository only, not all of raw.githubusercontent.com.</td>
     </tr>
   </table>
 
   <h2>Third parties</h2>
-  <p>PoE Trade Declutter is an independent, unofficial project and is not affiliated with or endorsed by Grinding Gear Games. It does not share data with Grinding Gear Games, advertisers, or any other third party — it has no mechanism to do so.</p>
+  <p>PoE Trade Declutter is an independent, unofficial project and is not affiliated with or endorsed by Grinding Gear Games. It does not share your data with Grinding Gear Games, advertisers, or any other third party — it has no mechanism to do so. The one outgoing request it makes (to RePoE, described above) only downloads public game data; it does not upload anything about you.</p>
 
   <h2>Changes to this policy</h2>
   <p>If this policy changes, the "Last updated" date above will be revised and the change will be reflected in the extension's <a href="https://github.com/vinzenz-san/poe-trade-declutter">GitHub repository</a>.</p>

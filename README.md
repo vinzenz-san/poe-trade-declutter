@@ -1,13 +1,24 @@
 # PoE Trade Declutter
 
-Browser extension (Firefox &amp; Chrome) to declutter the [Path of Exile trade site](https://www.pathofexile.com/trade/)'s filter UI — hide whole filter categories or individual filters you never use, without losing them permanently.
+Browser extension (Firefox &amp; Chrome) to declutter the [Path of Exile trade site](https://www.pathofexile.com/trade/)'s filter UI — hide whole filter categories or individual filters you never use, and pick minimum stat tiers directly from a filter's min/max boxes.
 
 ## Features
 
+**Filter visibility**
 - Hide/show individual filters within a category (small eye icon next to each filter's label).
 - Hide/show entire filter categories (eye icon next to each category's title).
-- Everything is reversible — a "Hidden filters (N)" toggle per category, and a global "Expand all hidden" button in the floating settings panel (small icon button in the top-right of the trade page).
-- No account, no network requests, no analytics — preferences are stored locally via `browser.storage.local`. See [`docs/privacy.html`](docs/privacy.html).
+- Everything is reversible — a "Hidden filters (N)" toggle per category, and a global "Reveal all hidden" button in the floating settings panel (small icon button in the top-right of the trade page).
+
+**Stat filter tier picker** (merged in from the former standalone poe-trade-tiers extension)
+- A "T" button next to a stat filter's min/max boxes lets you pick a minimum tier and fills in its value range — no more looking up exact numbers per tier.
+- "Browse Base Mods" lists every possible modifier for the selected item category and adds one straight into your search.
+- Tier data is discovered dynamically from [RePoE](https://github.com/brather1ng/RePoE) (see Credits below), not a hand-curated list, so coverage isn't limited to a handful of common stats.
+
+No account, no analytics, no data sent about you or your searches — preferences and the cached tier data are stored locally via `browser.storage.local`. The only outgoing network request is a one-way fetch of RePoE's public data files to build the tier tables. See [`docs/privacy.html`](docs/privacy.html).
+
+## Credits
+
+Tier data comes from [RePoE](https://github.com/brather1ng/RePoE), a community-maintained, MIT-licensed structured export of Path of Exile's game files (using [PyPoE](https://github.com/OmegaK2/PyPoE) for parsing). The underlying game data itself belongs to Grinding Gear Games — RePoE's code is MIT-licensed, but the generated `data` files it publishes are not; they're GGG's own content in a reformatted shape.
 
 ## Confirmed trade-site internals
 

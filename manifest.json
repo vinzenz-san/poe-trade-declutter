@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "PoE Trade Declutter",
-  "version": "0.1.0",
-  "description": "Hide unwanted filter categories and filters on the Path of Exile trade site — reversible with one click.",
+  "version": "0.2.1",
+  "description": "Hide unwanted filter categories and filters, and pick minimum stat tiers, on the Path of Exile trade site — reversible with one click.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -11,7 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.pathofexile.com/trade/*", "https://www.pathofexile.com/trade2/*"],
+      "matches": ["https://www.pathofexile.com/trade/*"],
       "js": ["dist/content.js"],
       "css": ["content.css"],
       "run_at": "document_start"
@@ -27,6 +27,7 @@
     }
   ],
   "permissions": ["storage"],
+  "host_permissions": ["https://raw.githubusercontent.com/brather1ng/RePoE/*"],
   "browser_specific_settings": {
     "gecko": {
       "id": "poe-trade-declutter@vinzenz-dev.de",

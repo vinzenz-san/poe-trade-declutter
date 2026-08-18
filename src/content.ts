@@ -4,6 +4,7 @@ import { ensureFloatingPanel } from "./floatingPanel";
 import { applyGroupTiering } from "./inlineControls";
 import { readTradeFilterSchema } from "./lscache";
 import { readTunerSettings } from "./settings";
+import { initTiersContent } from "./tiers/tiersContent";
 
 async function runDomUpdates(): Promise<void> {
   const tuner = await readTunerSettings();
@@ -27,6 +28,8 @@ function start(): void {
   debouncedRun();
   new MutationObserver(debouncedRun).observe(document.body, { childList: true, subtree: true });
   browser.storage.onChanged.addListener(debouncedRun);
+
+  initTiersContent();
 }
 
 if (document.readyState === "loading") {

@@ -1,5 +1,32 @@
+/* Shared design tokens for the floating panel and every feature box inside
+   it (Tier Picker's controls, the Browse Mods panel, tier menu, etc). One
+   accent, one text scale, one border/surface treatment — everything below
+   should reference these instead of hardcoding its own color/size, so the
+   two merged features (Declutter's filter-hiding, Tiers' tier picker)
+   read as one consistently-styled panel rather than two bolted-together
+   ones. */
 :root {
   --ptt-accent-color: #c8a86e;
+  --ptt-accent-rgb: 200, 168, 110;
+  --ptt-text: #ddd;
+  --ptt-text-dim: rgba(255, 255, 255, 0.55);
+  --ptt-text-faint: rgba(255, 255, 255, 0.35);
+  /* Box/section borders use the accent at low opacity (PoE's own UI trims
+     everything in a muted gold/tan, not neutral gray) — full-strength
+     --ptt-accent-color is reserved for interactive elements (buttons,
+     sliders, hover states) so those still stand out against it. */
+  --ptt-border-color: rgba(var(--ptt-accent-rgb), 0.35);
+  --ptt-surface: rgba(255, 255, 255, 0.04);
+  --ptt-surface-strong: #1c1c1c;
+  --ptt-panel-bg: #131313;
+  --ptt-radius: 5px;
+  --ptt-font-base: 12px;
+  --ptt-font-sm: 11px;
+  --ptt-font-xs: 10px;
+  /* Configurable via the Tier Picker settings sliders (font size / panel
+     width) — everything else above is fixed. */
+  --ptt-font-size: 11px;
+  --ptt-panel-width: 320px;
 }
 
 .ptt-groups-toggle {
@@ -9,8 +36,9 @@
   background: none;
   border: none;
   color: inherit;
-  opacity: 0.6;
+  opacity: 0.65;
   font-size: 0.85em;
+  font-family: inherit;
   cursor: pointer;
   padding: 2px 0 6px;
 }
@@ -24,9 +52,10 @@
   background: none;
   border: none;
   color: inherit;
-  opacity: 0.55;
+  opacity: 0.65;
   font-size: 0.8em;
   font-weight: normal;
+  font-family: inherit;
   cursor: pointer;
   padding: 0;
   margin-left: 8px;
@@ -69,12 +98,12 @@
   z-index: 3;
   vertical-align: middle;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--ptt-text-faint);
   line-height: 0;
 }
 
 .ptt-icon-toggle:hover {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--ptt-text-dim);
 }
 
 .ptt-icon-toggle.ptt-active {
@@ -142,12 +171,13 @@
   width: 260px;
   max-height: 400px;
   overflow-y: auto;
-  background: rgba(15, 15, 15, 0.97);
+  background: var(--ptt-panel-bg);
   border: 1px solid var(--ptt-accent-color);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 10px;
-  color: #ddd;
-  font-size: 12px;
+  color: var(--ptt-text);
+  font-size: var(--ptt-font-base);
+  font-family: system-ui, sans-serif;
 }
 
 .ptt-fab-panel.ptt-collapsed {
@@ -160,7 +190,7 @@
   gap: 7px;
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--ptt-border-color);
 }
 
 .ptt-fab-header-badge {
@@ -186,56 +216,379 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
+  color: var(--ptt-text);
 }
 
 .ptt-fab-header-version {
-  font-size: 11px;
+  font-size: var(--ptt-font-sm);
   font-weight: 500;
-  opacity: 0.4;
+  color: var(--ptt-text-faint);
   margin-left: auto;
+}
+
+/* Shared box + header used to group each feature's controls (filter
+   visibility actions, Tier Picker settings) so the panel reads as
+   sections rather than one flat list of mismatched buttons. */
+.ptt-fab-box {
+  margin-top: 10px;
+  padding: 8px 8px 2px;
+  background: var(--ptt-surface);
+  border: 1px solid var(--ptt-border-color);
+  border-radius: var(--ptt-radius);
+}
+
+.ptt-fab-box-title {
+  margin-bottom: 8px;
+  font-size: var(--ptt-font-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ptt-text-dim);
+  text-transform: uppercase;
 }
 
 .ptt-support-link {
   display: block;
   margin-top: 10px;
   text-align: center;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: var(--ptt-font-base);
+  color: var(--ptt-text-dim);
   text-decoration: none;
 }
 
 .ptt-support-link:hover {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--ptt-text);
   text-decoration: underline;
 }
 
-.ptt-reveal-button {
+/* Shared PoE-trade-style button: sharp corners (not rounded), gold/tan
+   outline, dark fill — and on hover it INVERTS to a solid gold fill with
+   dark text, mirroring the site's own "empty gold outline -> filled gold
+   square" button treatment rather than our earlier rounded/blue-tinted
+   generic web-button look. */
+.ptt-btn {
   width: 100%;
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: inherit;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ptt-accent-color);
+  color: var(--ptt-accent-color);
   padding: 5px 0;
-  border-radius: 4px;
+  border-radius: 2px;
   cursor: pointer;
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: var(--ptt-font-sm);
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  transition: background-color 0.1s, color 0.1s;
 }
 
-.ptt-reveal-button:hover {
+.ptt-btn:hover {
+  background: var(--ptt-accent-color);
+  color: #1a1408;
+}
+
+.ptt-btn--danger {
+  border-color: rgba(255, 110, 110, 0.7);
+  color: #ff8a8a;
+}
+
+.ptt-btn--danger:hover {
+  background: rgba(255, 110, 110, 0.85);
+  color: #1a0808;
+}
+
+/* ---- Tiers feature (ported from the standalone poe-trade-tiers
+   extension) — injects its own controls (tier picker, Browse Mods)
+   directly into the trade page's filter rows; its settings now live in
+   the shared floating panel above (see .ptt-fab-box), not a separate
+   icon. Class names don't collide with the rules above. ---- */
+
+.ptt-input-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.ptt-input-wrap input.minmax {
+  -moz-appearance: textfield;
+  padding-right: 16px;
+}
+
+.ptt-tier-picker {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+
+.ptt-tier-btn {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  line-height: 1;
+  font-size: var(--ptt-font-xs);
+  font-weight: bold;
+  color: var(--ptt-accent-color);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ptt-accent-color);
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.ptt-tier-btn:hover:not(:disabled) {
+  background: var(--ptt-accent-color);
+  color: #1a1408;
+  opacity: 1;
+}
+
+.ptt-tier-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ptt-tier-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  z-index: 9999;
+  min-width: 150px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--ptt-panel-bg);
+  border: 1px solid var(--ptt-border-color);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  font-family: system-ui, sans-serif;
+}
+
+.ptt-tier-item {
+  padding: 4px 8px;
+  font-size: var(--ptt-font-size);
+  color: var(--ptt-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ptt-tier-item:hover {
+  background: var(--ptt-surface-strong);
+  color: var(--ptt-accent-color);
+}
+
+.ptt-browse-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.ptt-browse-btn {
+  padding: 3px 8px;
+  font-size: var(--ptt-font-size);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ptt-accent-color);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ptt-accent-color);
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.1s, color 0.1s;
+}
+
+.ptt-browse-btn:hover {
+  background: var(--ptt-accent-color);
+  color: #1a1408;
+}
+
+.ptt-browse-btn--warning {
+  color: #ff8a8a;
+  border-color: rgba(255, 110, 110, 0.7);
+}
+
+.ptt-browse-btn--warning:hover {
+  background: rgba(255, 110, 110, 0.85);
+  color: #1a0808;
+}
+
+.ptt-browse-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 9999;
+  width: var(--ptt-panel-width);
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  background: var(--ptt-panel-bg);
+  border: 1px solid var(--ptt-border-color);
+  border-radius: 3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  font-family: system-ui, sans-serif;
+}
+
+/* A class selector's `display` beats the UA stylesheet's `[hidden] {
+   display: none }` (attribute selector loses to class specificity), so
+   without this override, setting `.hidden = true` on the panel had no
+   visible effect. */
+.ptt-browse-panel[hidden] {
+  display: none;
+}
+
+.ptt-browse-search {
+  margin: 6px;
+  padding: 4px 6px;
+  font-size: calc(var(--ptt-font-size) + 1px);
+  background: var(--ptt-surface-strong);
+  border: 1px solid var(--ptt-border-color);
+  border-radius: 3px;
+  color: var(--ptt-text);
+  font-family: inherit;
+}
+
+.ptt-browse-subtypes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 6px 6px;
+}
+
+.ptt-browse-subtype-btn {
+  padding: 2px 7px;
+  font-size: calc(var(--ptt-font-size) - 1px);
+  color: var(--ptt-text-dim);
+  background: var(--ptt-surface-strong);
+  border: 1px solid var(--ptt-border-color);
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ptt-browse-subtype-btn:hover {
+  border-color: var(--ptt-accent-color);
+  color: var(--ptt-text);
+}
+
+.ptt-browse-subtype-btn--active {
+  color: var(--ptt-panel-bg);
+  background: var(--ptt-accent-color);
   border-color: var(--ptt-accent-color);
 }
 
-.ptt-reset-button {
-  width: 100%;
-  background: none;
-  border: 1px solid rgba(255, 80, 80, 0.5);
-  color: #ff8a8a;
-  padding: 6px 0;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
+.ptt-browse-list {
+  overflow-y: auto;
 }
 
-.ptt-reset-button:hover {
-  background: rgba(255, 80, 80, 0.1);
+.ptt-browse-section {
+  padding: 4px 10px;
+  font-size: calc(var(--ptt-font-size) - 1px);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ptt-text-dim);
+  background: var(--ptt-surface-strong);
+  position: sticky;
+  top: 0;
+}
+
+.ptt-browse-item {
+  padding: 5px 10px;
+  font-size: var(--ptt-font-size);
+  color: var(--ptt-text);
+  cursor: pointer;
+}
+
+.ptt-browse-item:hover {
+  background: var(--ptt-surface-strong);
+  color: var(--ptt-accent-color);
+}
+
+.ptt-browse-empty {
+  padding: 8px 10px;
+  font-size: var(--ptt-font-size);
+  color: var(--ptt-text-dim);
+  font-style: italic;
+}
+
+.ptt-browse-note {
+  padding: 6px 10px;
+  font-size: calc(var(--ptt-font-size) - 1px);
+  line-height: 1.4;
+  color: var(--ptt-text-dim);
+  font-style: italic;
+  border-top: 1px solid var(--ptt-border-color);
+}
+
+/* Tiers settings controls (sliders/toggles) — rendered inside Declutter's
+   own floating panel now (see floatingPanel.ts, and .ptt-fab-box /
+   .ptt-fab-box-title above), not a separate settings icon, so only the
+   row/control styles remain here; the standalone wrapper/icon/panel/title/
+   coffee-link rules that used to anchor a second floating icon were
+   removed with that icon. */
+.ptt-settings-row {
+  margin-bottom: 8px;
+}
+
+.ptt-settings-label {
+  display: block;
+  font-size: var(--ptt-font-sm);
+  color: var(--ptt-text);
+  margin-bottom: 2px;
+}
+
+.ptt-settings-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+/* Matches the trade site's own checkbox style: an empty gold-outlined
+   square when unchecked, filled solid (cream/white, not a checkmark) when
+   checked — replacing the browser's native blue checkbox+tick. */
+.ptt-settings-toggle-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ptt-accent-color);
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.ptt-settings-toggle-label input[type="checkbox"]:checked {
+  background: #f1e6d0;
+  border-color: #f1e6d0;
+  /* Inset ring separates the white fill from the outer edge — otherwise
+     the checked square reads as one flat blob with no boundary. */
+  box-shadow: inset 0 0 0 2px #000;
+}
+
+.ptt-settings-toggle-label input[type="checkbox"]:hover {
+  border-color: #f1e6d0;
+}
+
+.ptt-settings-slider-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ptt-settings-slider {
+  flex: 1;
+  /* Recolors the native thumb/track from the browser's default blue to
+     the accent gold, in supported browsers (Firefox 113+/Chrome 93+). */
+  accent-color: var(--ptt-accent-color);
+}
+
+.ptt-settings-slider-value {
+  min-width: 28px;
+  text-align: right;
+  font-size: var(--ptt-font-sm);
+  color: var(--ptt-text-dim);
 }
