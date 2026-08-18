@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 — 2026-08-18
+
+Chrome Web Store is live — landing page's Chrome badge now links to the real listing instead of being greyed out, and the site copy/footer mention Chrome availability and the tier picker feature. Browse Base Mods list no longer shows the internal `~explicit ` search-syntax prefix in its display text (still typed into trade's own search box under the hood, just not shown to the user — it read as noise, not something they need to know or type themselves).
+
 ## 0.2.1 — 2026-08-18
 
 Tier Picker's settings (font size, panel width, tier picker/Browse Base Mods toggles) moved out of their own separate bottom-right gear icon into the shared floating panel, next to the existing filter-hiding controls — one settings surface instead of two. Both feature groups now sit in their own labeled box ("Filter Visibility" / "Stat Filter Tier Picker") with a consistent PoE-trade-style look: gold-outlined buttons that fill solid gold on hover, square checkboxes matching the site's own (empty outline / solid cream fill with a black inset ring), gold slider accents, and one shared color/font-size scale across both feature sets instead of the mismatched fonts and blue-tinted native controls left over from the merge. Browse Base Mods now shows a visible "Select an item category first" warning on the button itself instead of only logging to the console. Added a "Report an issue" link (same pattern as StartGrid's settings panel) below the existing support link. Reveal/Reset button defaults: font size 12, panel width 400, with the width slider stepping in increments of 5. "Expand all hidden" renamed to "Reveal all hidden" to match the existing internal naming.

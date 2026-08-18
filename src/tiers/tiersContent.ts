@@ -444,7 +444,11 @@ function buildBrowsePanel(category: string, searchInput: HTMLInputElement): HTML
     const item = document.createElement("div");
     item.className = "ptt-browse-item";
     const localSuffix = PREFER_LOCAL_STAT_IDS.has(entry.statId) ? " (Local)" : "";
-    const displayLabel = "~explicit " + entry.label.replace(/\{\d+\}/g, "#") + localSuffix;
+    // "~explicit " is trade's own search-syntax prefix (see explicitSearchText,
+    // which still uses it when actually typing into the search box) — dropped
+    // here since it's just noise for a human reading the list, not something
+    // the user needs to see or type themselves.
+    const displayLabel = entry.label.replace(/\{\d+\}/g, "#") + localSuffix;
     const tierWord = entry.tiers.length === 1 ? "tier" : "tiers";
     item.textContent = `${displayLabel} (${entry.tiers.length} ${tierWord})`;
     item.addEventListener("click", async (e) => {
