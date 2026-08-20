@@ -1,6 +1,16 @@
 import browser from "webextension-polyfill";
+import { getBoxCollapsed, setBoxCollapsed, type BoxId } from "./boxCollapseState";
 import { SHOW_INACTIVE_FIELDS_CLASS } from "./domFields";
+import {
+  addFavorite,
+  getFavorites,
+  overwriteFavoriteUrl,
+  removeFavorite,
+  renameFavorite,
+  reorderFavorites,
+} from "./favorites";
 import { GROUPS_CONTAINER_CLASS, SHOW_HIDDEN_GROUPS_CLASS } from "./inlineControls";
+import { getPanelHeight, setPanelHeight } from "./panelSize";
 import { resetTunerSettings } from "./settings";
 import {
   getTiersSettings,
@@ -9,9 +19,11 @@ import {
   tiersSettingsReady,
   type TiersSettings,
 } from "./tiers/tiersContent";
+import type { Favorite } from "./types";
 
 const ROOT_ID = "ptt-fab-root";
 const RESET_ARM_TIMEOUT_MS = 3000;
+const DELETE_ARM_TIMEOUT_MS = 3000;
 
 function buildSliderRow(
   labelText: string,
@@ -80,16 +92,30 @@ function buildToggleRow(labelText: string, checked: boolean, onChange: (val: boo
 }
 
 // Shared by every feature section (filter-visibility actions, Tier Picker
-// settings) so each reads as its own labeled box rather than the panel
-// being one flat list of mismatched buttons.
-function buildBox(title: string): HTMLElement {
+// settings, Favorites) so each reads as its own labeled box rather than the
+// panel being one flat list of mismatched buttons. All three collapse
+// independently, default collapsed, with the expand/collapse state persisted
+// per-box in storage so it survives across browser sessions.
+function buildBox(title: string, boxId: BoxId): HTMLElement {
   const box = document.createElement("div");
-  box.className = "ptt-fab-box";
+  box.className = "ptt-fab-box ptt-fab-box--collapsible ptt-collapsed";
 
   const heading = document.createElement("div");
-  heading.className = "ptt-fab-box-title";
+  heading.className = "ptt-fab-box-title ptt-fab-box-title--toggle";
   heading.textContent = title;
+  const chevron = document.createElement("span");
+  chevron.className = "ptt-fab-box-chevron";
+  chevron.textContent = "▸";
+  heading.appendChild(chevron);
+  heading.onclick = () => {
+    const collapsed = box.classList.toggle("ptt-collapsed");
+    void setBoxCollapsed(boxId, collapsed);
+  };
   box.appendChild(heading);
+
+  void getBoxCollapsed(boxId).then((collapsed) => {
+    box.classList.toggle("ptt-collapsed", collapsed);
+  });
 
   return box;
 }
@@ -100,7 +126,7 @@ function buildBox(title: string): HTMLElement {
 // storage read resolves (tiersSettingsReady), since ensureFloatingPanel()
 // itself runs before that async load finishes.
 function buildTiersSection(): HTMLElement {
-  const section = buildBox("Stat Filter Tier Picker");
+  const section = buildBox("Stat Filter Tier Picker", "tierPicker");
 
   function set<K extends keyof TiersSettings>(key: K, value: TiersSettings[K]): void {
     setTiersSetting(key, value);
@@ -158,6 +184,201 @@ function buildRefreshTierDataRow(): HTMLElement {
   return row;
 }
 
+// Favorites are saved trade-search URLs. There's no "current search" state
+// tracked elsewhere in the extension (the trade site keeps it in its own
+// URL), so "save current search" just snapshots window.location.href as-is
+// — whatever page the user is on when they click it.
+function buildFavoritesSection(): HTMLElement {
+  const box = buildBox("Favorites", "favorites");
+
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "ptt-btn";
+  saveButton.textContent = "Save current search";
+
+  const saveNameInput = document.createElement("input");
+  saveNameInput.type = "text";
+  saveNameInput.className = "ptt-favorite-save-input";
+  saveNameInput.placeholder = "Name this search…";
+  saveNameInput.hidden = true;
+
+  const list = document.createElement("div");
+  list.className = "ptt-favorites-list ptt-scroll-thin";
+
+  let dragFromId: string | null = null;
+
+  function renderList(favorites: Favorite[]): void {
+    list.replaceChildren();
+    if (favorites.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "ptt-favorites-empty";
+      empty.textContent = "No saved searches yet.";
+      list.appendChild(empty);
+      return;
+    }
+    for (const favorite of favorites) {
+      list.appendChild(buildFavoriteRow(favorite));
+    }
+  }
+
+  function buildFavoriteRow(favorite: Favorite): HTMLElement {
+    const row = document.createElement("div");
+    row.className = "ptt-favorite-row";
+    row.draggable = true;
+
+    row.addEventListener("dragstart", (e) => {
+      dragFromId = favorite.id;
+      row.classList.add("ptt-favorite-row--dragging");
+      e.dataTransfer?.setData("text/plain", favorite.id);
+    });
+    row.addEventListener("dragend", () => {
+      row.classList.remove("ptt-favorite-row--dragging");
+      dragFromId = null;
+    });
+    row.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      row.classList.add("ptt-favorite-row--drop-target");
+    });
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("ptt-favorite-row--drop-target");
+    });
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      row.classList.remove("ptt-favorite-row--drop-target");
+      if (!dragFromId || dragFromId === favorite.id) return;
+      const ids = Array.from(list.querySelectorAll<HTMLElement>(".ptt-favorite-row")).map(
+        (el) => el.dataset.favoriteId as string
+      );
+      const fromIndex = ids.indexOf(dragFromId);
+      const toIndex = ids.indexOf(favorite.id);
+      if (fromIndex === -1 || toIndex === -1) return;
+      const moved = ids.splice(fromIndex, 1)[0];
+      if (!moved) return;
+      ids.splice(toIndex, 0, moved);
+      void reorderFavorites(ids).then(renderList);
+    });
+    row.dataset.favoriteId = favorite.id;
+
+    const dragHandle = document.createElement("span");
+    dragHandle.className = "ptt-favorite-drag-handle";
+    dragHandle.textContent = "⠿";
+    dragHandle.title = "Drag to reorder";
+
+    const nameLink = document.createElement("a");
+    nameLink.className = "ptt-favorite-name";
+    nameLink.href = favorite.url;
+    nameLink.textContent = favorite.name;
+
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "ptt-favorite-name-input";
+    nameInput.value = favorite.name;
+    nameInput.hidden = true;
+
+    function commitRename(): void {
+      nameInput.hidden = true;
+      nameLink.hidden = false;
+      const newName = nameInput.value.trim();
+      if (newName && newName !== favorite.name) {
+        void renameFavorite(favorite.id, newName).then(renderList);
+      }
+    }
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") nameInput.blur();
+      if (e.key === "Escape") {
+        nameInput.value = favorite.name;
+        nameInput.blur();
+      }
+    });
+    nameInput.addEventListener("blur", commitRename);
+    nameInput.addEventListener("click", (e) => e.stopPropagation());
+
+    const actions = document.createElement("div");
+    actions.className = "ptt-favorite-actions";
+
+    const renameButton = document.createElement("button");
+    renameButton.type = "button";
+    renameButton.className = "ptt-favorite-icon-btn";
+    renameButton.title = "Rename";
+    renameButton.textContent = "✎";
+    renameButton.onclick = () => {
+      nameLink.hidden = true;
+      nameInput.hidden = false;
+      nameInput.focus();
+      nameInput.select();
+    };
+
+    const overwriteButton = document.createElement("button");
+    overwriteButton.type = "button";
+    overwriteButton.className = "ptt-favorite-icon-btn";
+    overwriteButton.title = "Overwrite with current search";
+    overwriteButton.textContent = "⟳";
+    overwriteButton.onclick = () => {
+      void overwriteFavoriteUrl(favorite.id, window.location.href).then(renderList);
+    };
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "ptt-favorite-icon-btn ptt-favorite-icon-btn--danger";
+    deleteButton.title = "Delete";
+    deleteButton.textContent = "✕";
+    let deleteArmed = false;
+    let deleteArmTimer: number | undefined;
+    deleteButton.onclick = () => {
+      if (!deleteArmed) {
+        deleteArmed = true;
+        deleteButton.textContent = "✓?";
+        deleteArmTimer = window.setTimeout(() => {
+          deleteArmed = false;
+          deleteButton.textContent = "✕";
+        }, DELETE_ARM_TIMEOUT_MS);
+        return;
+      }
+      window.clearTimeout(deleteArmTimer);
+      void removeFavorite(favorite.id).then(renderList);
+    };
+
+    actions.append(renameButton, overwriteButton, deleteButton);
+    row.append(dragHandle, nameLink, nameInput, actions);
+    return row;
+  }
+
+  const savedUrlAtOpen = { current: "" };
+
+  function commitSave(): void {
+    const name = saveNameInput.value.trim();
+    saveNameInput.hidden = true;
+    saveButton.hidden = false;
+    if (!name) return;
+    void addFavorite(name, savedUrlAtOpen.current).then(renderList);
+  }
+
+  saveNameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") saveNameInput.blur();
+    if (e.key === "Escape") {
+      saveNameInput.value = "";
+      saveNameInput.blur();
+    }
+  });
+  saveNameInput.addEventListener("blur", commitSave);
+  saveNameInput.addEventListener("click", (e) => e.stopPropagation());
+
+  saveButton.onclick = () => {
+    savedUrlAtOpen.current = window.location.href;
+    saveNameInput.value = document.title || "Saved search";
+    saveButton.hidden = true;
+    saveNameInput.hidden = false;
+    saveNameInput.focus();
+    saveNameInput.select();
+  };
+
+  box.append(saveButton, saveNameInput, list);
+  void getFavorites().then(renderList);
+
+  return box;
+}
+
 function anyRevealed(): boolean {
   return (
     document.querySelector(`.${GROUPS_CONTAINER_CLASS}.${SHOW_HIDDEN_GROUPS_CLASS}`) !== null ||
@@ -191,7 +412,30 @@ export function ensureFloatingPanel(): void {
   button.append(buttonIcon);
 
   const panel = document.createElement("div");
-  panel.className = "ptt-fab-panel ptt-collapsed";
+  panel.className = "ptt-fab-panel ptt-collapsed ptt-scroll-thin";
+
+  void getPanelHeight().then((height) => {
+    if (height) panel.style.height = `${height}px`;
+  });
+
+  // The CSS `resize: vertical` handle changes the panel's height via drag,
+  // which ResizeObserver reports like any other size change — this is the
+  // only reliable cross-browser way to detect it (no native "resizeend"
+  // event exists). Debounced so we don't hit storage on every pixel of drag.
+  let resizeSaveTimer: number | undefined;
+  const resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (!entry) return;
+    const height = Math.round(entry.contentRect.height);
+    // Collapsing sets display:none, which also fires a (0-height) resize
+    // entry — skip it so we don't clobber the saved drag height.
+    if (height <= 0 || panel.classList.contains("ptt-collapsed")) return;
+    window.clearTimeout(resizeSaveTimer);
+    resizeSaveTimer = window.setTimeout(() => {
+      void setPanelHeight(height);
+    }, 300);
+  });
+  resizeObserver.observe(panel);
 
   const manifest = browser.runtime.getManifest();
   const header = document.createElement("div");
@@ -251,7 +495,7 @@ export function ensureFloatingPanel(): void {
   reportIssueLink.rel = "noopener noreferrer";
   reportIssueLink.textContent = "🐙 Report an issue";
 
-  const actionsBox = buildBox("Filter Visibility");
+  const actionsBox = buildBox("Filter Visibility", "filterVisibility");
   actionsBox.append(revealButton, resetButton);
 
   panel.append(header, actionsBox);
@@ -263,6 +507,7 @@ export function ensureFloatingPanel(): void {
   // regardless of how many feature sections come before them.
   void tiersSettingsReady.then(() => {
     panel.appendChild(buildTiersSection());
+    panel.appendChild(buildFavoritesSection());
     panel.appendChild(supportLink);
     panel.appendChild(reportIssueLink);
   });

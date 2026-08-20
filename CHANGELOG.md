@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 — 2026-08-20
+
+Added a third settings-panel section, Favorites: save the current trade search as a named bookmark, then rename, overwrite with the current search, delete, or drag to reorder saved entries (newest first by default). All three panel sections (Filter Visibility, Stat Filter Tier Picker, Favorites) are now independently collapsible, default collapsed, with each section's expand/collapse state persisted across sessions. The panel itself can now be resized vertically via a drag handle, and its height is likewise remembered across sessions/tabs. Long lists (the panel body, Favorites) use a shared thin dark scrollbar instead of the browser's default. Release tooling: `release/` zips are now named `vX.X.X-<target>.zip` so they sort by version, older release zips are no longer deleted on each release build, and a new `pnpm dev:chrome` / `dev:firefox` step stages a ready-to-load-unpacked folder at `dist-unpacked/<target>` so testing a change no longer requires unzipping a release build.
+
 ## 0.2.2 — 2026-08-18
 
 Chrome Web Store is live — landing page's Chrome badge now links to the real listing instead of being greyed out, and the site copy/footer mention Chrome availability and the tier picker feature. Browse Base Mods list no longer shows the internal `~explicit ` search-syntax prefix in its display text (still typed into trade's own search box under the hood, just not shown to the user — it read as noise, not something they need to know or type themselves).

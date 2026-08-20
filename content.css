@@ -29,6 +29,19 @@
   --ptt-panel-width: 320px;
 }
 
+/* Shared thin scrollbar (ported from StartGrid's .sg-scroll-thin, dark
+   variant only — this extension has no light mode). scrollbar-width/-color
+   cover Firefox; ::-webkit-scrollbar* covers Chromium. Apply to whichever
+   element sets overflow: auto/scroll — don't duplicate this per section. */
+.ptt-scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ptt-border-color) transparent;
+}
+.ptt-scroll-thin::-webkit-scrollbar { width: 4px; }
+.ptt-scroll-thin::-webkit-scrollbar-track { background: transparent; }
+.ptt-scroll-thin::-webkit-scrollbar-thumb { background: var(--ptt-border-color); border-radius: 2px; }
+.ptt-scroll-thin::-webkit-scrollbar-thumb:hover { background: var(--ptt-text-dim); }
+
 .ptt-groups-toggle {
   display: block;
   width: 100%;
@@ -169,8 +182,14 @@
   top: 40px;
   right: 0;
   width: 260px;
-  max-height: 400px;
+  height: 400px;
+  min-height: 150px;
+  max-height: 80vh;
   overflow-y: auto;
+  /* Native browser resize handle (bottom-left corner, since the panel is
+     right-anchored) lets the user drag the panel taller when its content
+     (e.g. a long Favorites list) outgrows the default height. */
+  resize: vertical;
   background: var(--ptt-panel-bg);
   border: 1px solid var(--ptt-accent-color);
   border-radius: 8px;
@@ -591,4 +610,144 @@
   text-align: right;
   font-size: var(--ptt-font-sm);
   color: var(--ptt-text-dim);
+}
+
+/* Favorites: a collapsible .ptt-fab-box (default collapsed) that lists
+   saved trade-search URLs. The title row doubles as the expand/collapse
+   toggle, so its body is hidden via the same .ptt-collapsed class the
+   outer panel uses, just scoped to this one box. */
+.ptt-fab-box-title--toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ptt-fab-box-chevron {
+  font-size: var(--ptt-font-sm);
+  transition: transform 0.15s;
+}
+
+.ptt-fab-box--collapsible.ptt-collapsed .ptt-fab-box-chevron {
+  transform: rotate(0deg);
+}
+
+.ptt-fab-box--collapsible:not(.ptt-collapsed) .ptt-fab-box-chevron {
+  transform: rotate(90deg);
+}
+
+.ptt-fab-box--collapsible.ptt-collapsed > *:not(.ptt-fab-box-title) {
+  display: none;
+}
+
+.ptt-favorite-save-input,
+.ptt-favorite-name-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  margin-bottom: 8px;
+  font-size: var(--ptt-font-sm);
+  font-family: inherit;
+  background: var(--ptt-surface-strong);
+  border: 1px solid var(--ptt-accent-color);
+  border-radius: 2px;
+  color: var(--ptt-text);
+}
+
+.ptt-favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ptt-favorites-empty {
+  padding: 6px 2px;
+  font-size: var(--ptt-font-sm);
+  color: var(--ptt-text-dim);
+  font-style: italic;
+}
+
+.ptt-favorite-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: var(--ptt-surface-strong);
+}
+
+.ptt-favorite-row--dragging {
+  opacity: 0.4;
+}
+
+.ptt-favorite-row--drop-target {
+  border-color: var(--ptt-accent-color);
+}
+
+.ptt-favorite-drag-handle {
+  cursor: grab;
+  color: var(--ptt-text-faint);
+  font-size: var(--ptt-font-sm);
+  flex-shrink: 0;
+}
+
+.ptt-favorite-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--ptt-font-sm);
+  color: var(--ptt-text);
+  text-decoration: none;
+}
+
+.ptt-favorite-name:hover {
+  color: var(--ptt-accent-color);
+  text-decoration: underline;
+}
+
+.ptt-favorite-name-input {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.ptt-favorite-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ptt-favorite-icon-btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  line-height: 1;
+  font-size: var(--ptt-font-xs);
+  color: var(--ptt-accent-color);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ptt-accent-color);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.ptt-favorite-icon-btn:hover {
+  background: var(--ptt-accent-color);
+  color: #1a1408;
+}
+
+.ptt-favorite-icon-btn--danger {
+  border-color: rgba(255, 110, 110, 0.7);
+  color: #ff8a8a;
+}
+
+.ptt-favorite-icon-btn--danger:hover {
+  background: rgba(255, 110, 110, 0.85);
+  color: #1a0808;
 }

@@ -17,6 +17,14 @@ export interface TunerSettings {
   inactiveFields: Partial<Record<GroupId, string[]>>;
 }
 
+export interface Favorite {
+  id: string;
+  name: string;
+  url: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface FieldSchemaField {
   id: string;
   text?: string;
