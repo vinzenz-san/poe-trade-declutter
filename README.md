@@ -14,7 +14,11 @@ Browser extension (Firefox &amp; Chrome) to declutter the [Path of Exile trade s
 - "Browse Base Mods" lists every possible modifier for the selected item category and adds one straight into your search.
 - Tier data is discovered dynamically from [RePoE](https://github.com/brather1ng/RePoE) (see Credits below), not a hand-curated list, so coverage isn't limited to a handful of common stats.
 
-No account, no analytics, no data sent about you or your searches — preferences and the cached tier data are stored locally via `browser.storage.local`. The only outgoing network request is a one-way fetch of RePoE's public data files to build the tier tables. See [`docs/privacy.html`](docs/privacy.html).
+**Favorites**
+- Save the current trade search as a named bookmark, one click.
+- Rename, overwrite with the current search, delete, or drag to reorder saved searches.
+
+No account, no analytics, no data sent about you or your searches — preferences, saved searches, and the cached tier data are all stored locally via `browser.storage.local`. The only outgoing network request is a one-way fetch of RePoE's public data files to build the tier tables. See [`docs/privacy.html`](docs/privacy.html).
 
 ## Credits
 
@@ -38,7 +42,13 @@ pnpm typecheck
 
 **Load unpacked (Firefox)**: `about:debugging#/runtime/this-firefox` → Load Temporary Add-on → select `manifest.json` directly.
 
-**Load unpacked (Chrome)**: Chrome's MV3 background requires `service_worker`, which differs from Firefox's `scripts` key — the repo's `manifest.json` is Firefox-flavored, so for Chrome use `pnpm release` (below) and load the extracted `release/poe-trade-declutter-chrome-vX.Y.Z.zip` instead of this repo directly.
+**Load unpacked (Chrome)**: Chrome's MV3 background requires `service_worker`, which differs from Firefox's `scripts` key — the repo's `manifest.json` is Firefox-flavored, so Chrome can't load this repo directly. Instead:
+
+```bash
+pnpm dev:chrome     # or: pnpm dev:firefox
+```
+
+This builds and stages a self-contained, Chrome-flavored (or Firefox-flavored) extension folder at `dist-unpacked/chrome` (or `dist-unpacked/firefox`) — point "Load unpacked" at that folder and re-run the script after each change.
 
 ## Release
 
@@ -46,9 +56,9 @@ pnpm typecheck
 pnpm release
 ```
 
-Builds and packages three zips into `release/`:
-- `poe-trade-declutter-firefox-vX.Y.Z.zip` — Firefox-flavored manifest
-- `poe-trade-declutter-chrome-vX.Y.Z.zip` — Chrome-flavored manifest (derived automatically, `background.service_worker` instead of `scripts`)
-- `poe-trade-declutter-source-vX.Y.Z.zip` — source code bundle for AMO's review requirement
+Builds and packages three zips into `release/` (old-version zips are kept, not deleted, so they accumulate across releases):
+- `vX.Y.Z-firefox.zip` — Firefox-flavored manifest
+- `vX.Y.Z-chrome.zip` — Chrome-flavored manifest (derived automatically, `background.service_worker` instead of `scripts`)
+- `vX.Y.Z-source.zip` — source code bundle for AMO's review requirement
 
 See [`docs/store-listing.md`](docs/store-listing.md) for store listing copy and permission justifications.

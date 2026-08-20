@@ -1,31 +1,14 @@
 import { execSync } from "node:child_process";
-import { createWriteStream, mkdirSync, rmSync, cpSync, writeFileSync, readFileSync } from "node:fs";
+import { createWriteStream, mkdirSync, rmSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import archiver from "archiver";
+import { rootDir, stageTarget } from "./stageTarget.mjs";
 
-const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pkg = JSON.parse(readFileSync(path.join(rootDir, "package.json"), "utf8"));
-const baseManifest = JSON.parse(readFileSync(path.join(rootDir, "manifest.json"), "utf8"));
 
 const releaseDir = path.join(rootDir, "release");
 const stagingRoot = path.join(releaseDir, "staging");
-
-// Files shared by both browser targets, copied as-is into each staging dir.
-const SHARED_FILES = ["content.css", "icons"];
-const SHARED_DIST_FILES = ["content.js", "content.js.map", "background.js", "background.js.map"];
-
-// Firefox's manifest.json (source of truth for shared fields) already has `background.scripts` and
-// `browser_specific_settings`; Chrome's MV3 requires `background.service_worker` and rejects the
-// Firefox-only gecko key, so this derives the Chrome variant rather than hand-maintaining two files.
-function manifestFor(target) {
-  const manifest = structuredClone(baseManifest);
-  if (target === "chrome") {
-    delete manifest.browser_specific_settings;
-    manifest.background = { service_worker: "dist/background.js" };
-  }
-  return manifest;
-}
 
 function zipDir(srcDir, outFile) {
   return new Promise((resolve, reject) => {
@@ -42,17 +25,9 @@ function zipDir(srcDir, outFile) {
 
 async function buildTarget(target) {
   const stageDir = path.join(stagingRoot, target);
-  mkdirSync(path.join(stageDir, "dist"), { recursive: true });
+  stageTarget(target, stageDir);
 
-  for (const file of SHARED_FILES) {
-    cpSync(path.join(rootDir, file), path.join(stageDir, file), { recursive: true });
-  }
-  for (const file of SHARED_DIST_FILES) {
-    cpSync(path.join(rootDir, "dist", file), path.join(stageDir, "dist", file));
-  }
-  writeFileSync(path.join(stageDir, "manifest.json"), JSON.stringify(manifestFor(target), null, 2));
-
-  const outFile = path.join(releaseDir, `poe-trade-declutter-${target}-v${pkg.version}.zip`);
+  const outFile = path.join(releaseDir, `v${pkg.version}-${target}.zip`);
   const bytes = await zipDir(stageDir, outFile);
   console.log(`${outFile} (${bytes} bytes)`);
 }
@@ -60,7 +35,7 @@ async function buildTarget(target) {
 async function buildSourceZip() {
   // AMO reviews minified/bundled output against the original source, so this ships everything needed
   // to reproduce the build (excluding node_modules/dist/release, which pnpm install + pnpm build regenerate).
-  const outFile = path.join(releaseDir, `poe-trade-declutter-source-v${pkg.version}.zip`);
+  const outFile = path.join(releaseDir, `v${pkg.version}-source.zip`);
   mkdirSync(releaseDir, { recursive: true });
   const output = createWriteStream(outFile);
   const archive = archiver("zip", { zlib: { level: 9 } });
@@ -94,7 +69,10 @@ async function buildSourceZip() {
   console.log(`${outFile} (${bytes} bytes)`);
 }
 
-rmSync(releaseDir, { recursive: true, force: true });
+// Only clear the scratch staging dir, not releaseDir itself — releaseDir
+// accumulates zips across versions so older release builds stay available.
+rmSync(stagingRoot, { recursive: true, force: true });
+mkdirSync(releaseDir, { recursive: true });
 console.log("Building...");
 execSync("pnpm build", { cwd: rootDir, stdio: "inherit" });
 

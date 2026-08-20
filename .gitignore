@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-unpacked/
 release/
 *.log
 z_*.bat
