@@ -8,11 +8,19 @@ Browser extension (Firefox &amp; Chrome) to declutter the [Path of Exile trade s
 - Hide/show individual filters within a category (small eye icon next to each filter's label).
 - Hide/show entire filter categories (eye icon next to each category's title).
 - Everything is reversible — a "Hidden filters (N)" toggle per category, and a global "Reveal all hidden" button in the floating settings panel (small icon button in the top-right of the trade page).
+<table>
+<tr>
+<td><img width="762" height="666" alt="screenshot_1" src="https://github.com/user-attachments/assets/61743ab2-6d1c-462b-a5d4-7ff482948e49" /></td>
+<td><img width="271" height="734" alt="screenshot_5" src="https://github.com/user-attachments/assets/268903ad-b898-4e9a-ad3e-63fe3c42a592" /></td>
+</tr>
+</table>
 
 **Stat filter tier picker** (merged in from the former standalone poe-trade-tiers extension)
-- A "T" button next to a stat filter's min/max boxes lets you pick a minimum tier and fills in its value range — no more looking up exact numbers per tier.
+- A "T" button next to a stat filter's min/max![Uploading screenshot_5.png…]()
+ boxes lets you pick a minimum tier and fills in its value range — no more looking up exact numbers per tier.
 - "Browse Base Mods" lists every possible modifier for the selected item category and adds one straight into your search.
 - Tier data is discovered dynamically from [RePoE](https://github.com/brather1ng/RePoE) (see Credits below), not a hand-curated list, so coverage isn't limited to a handful of common stats.
+<img width="614" height="238" alt="Screenshot_3" src="https://github.com/user-attachments/assets/67688113-a862-4ea4-919e-e3e40aaf7706" />
 
 **Favorites**
 - Save the current trade search as a named bookmark, one click.
