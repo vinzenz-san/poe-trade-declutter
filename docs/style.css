@@ -36,43 +36,29 @@ body {
 }
 header { margin-bottom: 48px; }
 
-/* Promo tile hero — same artwork as store-assets/promo-tile-small-440x280.html,
-   cropped to 440x160 so it reads as a banner here rather than the square-ish
-   tile the store listing requires.
-   background-position insets the grid by half a cell (20px of the 40px pitch).
-   Without it a gridline lands exactly on x=0 and y=0 — the repeating gradient is
-   anchored to the box's top-left, so trimming the box can never clear the left
-   or top edge, only the right and bottom. Offsetting is what keeps all four
-   edges free of a line sitting flush against them. */
-.hero-tile {
-  width: 100%;
-  max-width: 440px;
-  aspect-ratio: 440 / 160;
-  margin: 0 auto 28px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  background-color: #0a0a0a;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(168, 85, 247, 0.35) 0px, rgba(168, 85, 247, 0.35) 1px, transparent 1px, transparent 40px),
-    repeating-linear-gradient(90deg, rgba(168, 85, 247, 0.35) 0px, rgba(168, 85, 247, 0.35) 1px, transparent 1px, transparent 40px);
-  background-position: 20px 20px;
+/* Centered hero: icon + wordmark, no container/background — just the two
+   elements centered on the page's own background. */
+.hero-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5%;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
 }
-.hero-tile-logo {
-  width: 21%;
-  height: auto;
-  filter: invert(1);
+.hero-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  flex-shrink: 0;
 }
-.hero-tile-word {
-  color: #fff;
-  font-size: clamp(2rem, 12.7vw, 3.5rem);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  line-height: 1;
+.hero-word {
+  color: var(--text);
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin: 0;
+  text-align: center;
 }
 
 /* Store badges — every cell is the same 206x58 box (official badge dimensions) */
