@@ -1,7 +1,7 @@
 import { createIconToggle, syncIconToggle } from "./iconToggle";
-import { extractLabelText } from "./labelUtils";
+import { extractLabelText, slugify } from "./labelUtils";
 import { readTunerSettings, writeTunerSettings } from "./settings";
-import type { FieldSchemaGroup, GroupId } from "./types";
+import type { GroupId } from "./types";
 
 const GROUP_CHECKBOX_CLASS = "ptt-group-inactive-toggle";
 const INACTIVE_GROUP_CLASS = "ptt-inactive-group";
@@ -39,9 +39,7 @@ function updateHiddenGroupsLabel(container: HTMLElement): void {
   }
 }
 
-export function applyGroupTiering(schema: FieldSchemaGroup[] | null, inactiveGroups: GroupId[]): void {
-  if (!schema) return;
-
+export function applyGroupTiering(inactiveGroups: GroupId[]): void {
   const groupEls = Array.from(document.querySelectorAll<HTMLElement>(".filter-group"));
   const container = groupEls[0]?.parentElement;
   if (!(container instanceof HTMLElement)) return;
@@ -52,10 +50,10 @@ export function applyGroupTiering(schema: FieldSchemaGroup[] | null, inactiveGro
   groupEls.forEach((groupEl) => {
     const titleEl = groupEl.querySelector<HTMLElement>(".filter-group-header .filter-title");
     const title = titleEl ? extractLabelText(titleEl) : null;
-    const schemaGroup = schema.find((g) => g.title === title);
-    if (!schemaGroup || !titleEl) return;
+    if (!title || !titleEl) return;
+    const groupId = slugify(title);
 
-    const isInactive = inactiveSet.has(schemaGroup.id);
+    const isInactive = inactiveSet.has(groupId);
     groupEl.classList.toggle(INACTIVE_GROUP_CLASS, isInactive);
 
     let toggle = titleEl.querySelector<HTMLButtonElement>(`.${GROUP_CHECKBOX_CLASS}`);
@@ -73,7 +71,7 @@ export function applyGroupTiering(schema: FieldSchemaGroup[] | null, inactiveGro
       syncIconToggle(toggle!, nextInactive, nextInactive ? "Hidden — click to show" : "Click to hide this category");
       groupEl.classList.toggle(INACTIVE_GROUP_CLASS, nextInactive);
       updateHiddenGroupsLabel(container);
-      void toggleGroupInactive(schemaGroup.id, nextInactive);
+      void toggleGroupInactive(groupId, nextInactive);
     };
   });
 

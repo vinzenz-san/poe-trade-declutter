@@ -1,6 +1,5 @@
 import { createIconToggle, syncIconToggle } from "./iconToggle";
-import { extractLabelText } from "./labelUtils";
-import { readTradeFilterSchema } from "./lscache";
+import { extractLabelText, slugify } from "./labelUtils";
 import { readTunerSettings, writeTunerSettings } from "./settings";
 import type { GroupId } from "./types";
 
@@ -88,28 +87,24 @@ function ensureFieldCheckbox(
 }
 
 export function applyFieldTiering(inactiveFields: Partial<Record<GroupId, string[]>>): void {
-  const schema = readTradeFilterSchema();
-  if (!schema) return;
-
   document.querySelectorAll(".filter-group").forEach((groupEl) => {
     const titleEl = groupEl.querySelector(".filter-group-header .filter-title");
     const title = titleEl ? extractLabelText(titleEl) : null;
-    const schemaGroup = schema.find((g) => g.title === title);
-    if (!schemaGroup) return;
+    if (!title) return;
+    const groupId = slugify(title);
 
     const body = groupEl.querySelector<HTMLElement>(".filter-group-body");
     if (!body) return;
 
-    const inactiveIds = new Set(inactiveFields[schemaGroup.id] ?? []);
-    const textToId = new Map(schemaGroup.filters.map((f) => [f.text, f.id]));
+    const inactiveIds = new Set(inactiveFields[groupId] ?? []);
 
     getFieldRows(body).forEach((row) => {
       const label = getRowLabel(row);
-      const fieldId = label ? textToId.get(label) : undefined;
-      if (!fieldId) return;
+      if (!label) return;
+      const fieldId = slugify(label);
 
       const isInactive = inactiveIds.has(fieldId);
-      ensureFieldCheckbox(row, groupEl, body, schemaGroup.id, fieldId, isInactive);
+      ensureFieldCheckbox(row, groupEl, body, groupId, fieldId, isInactive);
       row.classList.toggle(INACTIVE_FIELD_CLASS, isInactive);
     });
 

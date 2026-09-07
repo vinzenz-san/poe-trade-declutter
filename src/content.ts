@@ -2,15 +2,13 @@ import browser from "webextension-polyfill";
 import { applyFieldTiering } from "./domFields";
 import { ensureFloatingPanel } from "./floatingPanel";
 import { applyGroupTiering } from "./inlineControls";
-import { readTradeFilterSchema } from "./lscache";
 import { readTunerSettings } from "./settings";
 import { initTiersContent } from "./tiers/tiersContent";
 
 async function runDomUpdates(): Promise<void> {
   const tuner = await readTunerSettings();
-  const schema = readTradeFilterSchema();
   applyFieldTiering(tuner.inactiveFields);
-  applyGroupTiering(schema, tuner.inactiveGroups);
+  applyGroupTiering(tuner.inactiveGroups);
   ensureFloatingPanel();
 }
 

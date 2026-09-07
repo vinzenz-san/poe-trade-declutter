@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 — 2026-09-07
+
+Fixed the hide/show eye icons disappearing entirely for both filters and filter categories. GGG removed the `localStorage` cache the extension used to look up filter ids, breaking the lookup outright — icon placement is now derived directly from each filter's own visible label text instead of that (now-gone) internal schema, so it no longer depends on an undocumented implementation detail of the trade site. Previously hidden filters/categories reset to visible once on update (no crash, just a one-time reset of that selection).
+
 ## 0.3.0 — 2026-08-20
 
 Added a third settings-panel section, Favorites: save the current trade search as a named bookmark, then rename, overwrite with the current search, delete, or drag to reorder saved entries (newest first by default). All three panel sections (Filter Visibility, Stat Filter Tier Picker, Favorites) are now independently collapsible, default collapsed, with each section's expand/collapse state persisted across sessions. The panel itself can now be resized vertically via a drag handle, and its height is likewise remembered across sessions/tabs. Long lists (the panel body, Favorites) use a shared thin dark scrollbar instead of the browser's default. Release tooling: `release/` zips are now named `vX.X.X-<target>.zip` so they sort by version, older release zips are no longer deleted on each release build, and a new `pnpm dev:chrome` / `dev:firefox` step stages a ready-to-load-unpacked folder at `dist-unpacked/<target>` so testing a change no longer requires unzipping a release build.
